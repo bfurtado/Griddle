@@ -458,8 +458,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                data = _.first(data, (currentPage + 1) * this.props.resultsPerPage);
 	            } else {
 	                //the 'rest' is grabbing the whole array from index on and the 'initial' is getting the first n results
-	                var rest = _.rest(data, currentPage * this.props.resultsPerPage);
-	                data = _.initial(rest, rest.length - this.props.resultsPerPage);
+	                var rest = _.drop(data, currentPage * this.props.resultsPerPage);
+	                data = (_.dropRight || _.initial)(rest, rest.length - this.props.resultsPerPage);
 	            }
 	        }
 
@@ -1255,7 +1255,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      gridStyle = {
 	        position: "relative",
 	        overflowY: "scroll",
-	        height: this.props.bodyHeight + "px",
+	        maxHeight: this.props.bodyHeight + "px",
 	        width: "100%"
 	      };
 	    }
@@ -1753,12 +1753,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.props.toggleChildren();
 	        }
 	    },
+	    handleSelectionChange: function (e) {
+	        //hack to get around warning that's not super useful in this case
+	        return;
+	    },
 	    handleSelectClick: function (e) {
 	        if (this.props.multipleSelectionSettings.isMultipleSelection) {
 	            if (e.target.type === "checkbox") {
 	                this.props.multipleSelectionSettings.toggleSelectRow(this.props.data, this.refs.selected.getDOMNode().checked);
 	            } else {
-	                this.props.multipleSelectionSettings.toggleSelectRow(this.props.data, !React.findDOMNode(this.refs.selected).checked);
+	                this.props.multipleSelectionSettings.toggleSelectRow(this.props.data, !this.refs.selected.getDOMNode().checked);
 	            }
 	        }
 	    },
@@ -1838,8 +1842,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            nodes.unshift(React.createElement(
 	                "td",
-	                { style: columnStyles },
-	                React.createElement("input", { type: "checkbox", checked: this.props.multipleSelectionSettings.getIsRowChecked(dataView), ref: "selected" })
+	                { key: "selection", style: columnStyles },
+	                React.createElement("input", {
+	                    type: "checkbox",
+	                    checked: this.props.multipleSelectionSettings.getIsRowChecked(dataView),
+	                    onChange: this.handleSelectionChange,
+	                    ref: "selected" })
 	            ));
 	        }
 
@@ -1984,6 +1992,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    toggleSelectAll: function (event) {
 	        this.props.multipleSelectionSettings.toggleSelectAll();
 	    },
+	    handleSelectionChange: function (event) {
+	        //hack to get around warning message that's not helpful in this case
+	        return;
+	    },
 	    verifyProps: function () {
 	        if (this.props.columnSettings === null) {
 	            console.error("gridTitle: The columnSettings prop is null and it shouldn't be");
@@ -2039,8 +2051,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (nodes && this.props.multipleSelectionSettings.isMultipleSelection) {
 	            nodes.unshift(React.createElement(
 	                "th",
-	                { onClick: this.toggleSelectAll, style: titleStyles },
-	                React.createElement("input", { type: "checkbox", checked: this.props.multipleSelectionSettings.getIsSelectAllChecked() })
+	                { key: "selection", onClick: this.toggleSelectAll, style: titleStyles },
+	                React.createElement("input", { type: "checkbox", checked: this.props.multipleSelectionSettings.getIsSelectAllChecked(), onChange: this.handleSelectionChange })
 	            ));
 	        }
 
