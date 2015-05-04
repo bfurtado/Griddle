@@ -193,7 +193,7 @@ var GridTable = React.createClass({
       gridStyle = {
         "position": "relative",
         "overflowY": "scroll",
-        "height": this.props.bodyHeight + "px",
+        "maxHeight": this.props.bodyHeight + "px",
         "width": "100%"
       };
     }
